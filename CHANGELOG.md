@@ -10,8 +10,6 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-11-04
-
 ### Added
 
 - Nuki Smart Lock (1.0 to 4th generation, 3.0 Pro, Ultra), Smart Door and Opener
@@ -39,5 +37,4 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish for the manifest, the messages, the
   widgets and the documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-Nuki/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/gboulvin/Gladys-Nuki/releases/tag/v1.0.0
+[Unreleased]: https://github.com/gboulvin/Gladys-Nuki/commits/main
