@@ -1,0 +1,1137 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Nuki",
+  "description": {
+    "en": "Nuki Smart Lock, Opener and Smart Door: via Bridge, MQTT or Nuki Web.",
+    "fr": "Serrures Nuki, Opener et Smart Door : via Bridge, MQTT ou Nuki Web.",
+    "de": "Nuki Smart Lock, Opener und Smart Door: über Bridge, MQTT oder Nuki Web.",
+    "es": "Nuki Smart Lock, Opener y Smart Door: vía Bridge, MQTT o Nuki Web."
+  },
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-nuki:1.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-Nuki/main/cover.png",
+  "categories": ["security"],
+  "transports": ["local", "cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Connect your Nuki devices",
+        "fr": "Connectez vos appareils Nuki",
+        "de": "Nuki-Geräte verbinden",
+        "es": "Conecte sus dispositivos Nuki"
+      },
+      "description": {
+        "en": "Fill in at least one of the three channels below. The Bridge and MQTT are local (fast, work without internet); Nuki Web is the cloud and also tells who operated the lock. You can combine them: Gladys uses the local one first and falls back to the other (see “Prefer the local connection”).",
+        "fr": "Renseignez au moins un des trois canaux ci-dessous. Le Bridge et MQTT sont locaux (rapides, fonctionnent sans internet) ; Nuki Web passe par le cloud et indique aussi qui a actionné la serrure. Vous pouvez les combiner : Gladys utilise d’abord le local et bascule sur l’autre en secours (voir « Préférer la connexion locale »).",
+        "de": "Füllen Sie mindestens einen der drei Kanäle unten aus. Bridge und MQTT sind lokal (schnell, funktionieren ohne Internet); Nuki Web läuft über die Cloud und zeigt auch, wer das Schloss bedient hat. Sie können sie kombinieren: Gladys nutzt zuerst den lokalen Kanal und weicht bei Bedarf auf den anderen aus (siehe „Lokale Verbindung bevorzugen“).",
+        "es": "Rellene al menos uno de los tres canales siguientes. El Bridge y MQTT son locales (rápidos, funcionan sin internet); Nuki Web pasa por la nube e indica además quién accionó la cerradura. Puede combinarlos: Gladys usa primero el local y recurre al otro como respaldo (vea «Preferir la conexión local»)."
+      },
+      "links": [
+        {
+          "url": "https://developer.nuki.io/page/nuki-bridge-http-api-1-13/4",
+          "label": {
+            "en": "Nuki Bridge HTTP API",
+            "fr": "API HTTP du Nuki Bridge",
+            "de": "Nuki Bridge HTTP-API",
+            "es": "API HTTP del Nuki Bridge"
+          }
+        },
+        {
+          "url": "https://web.nuki.io/",
+          "label": { "en": "Nuki Web", "fr": "Nuki Web", "de": "Nuki Web", "es": "Nuki Web" }
+        }
+      ]
+    },
+    {
+      "key": "bridge_section",
+      "type": "section",
+      "label": {
+        "en": "Nuki Bridge (local)",
+        "fr": "Nuki Bridge (local)",
+        "de": "Nuki Bridge (lokal)",
+        "es": "Nuki Bridge (local)"
+      },
+      "description": {
+        "en": "In the Nuki app, open the Bridge settings and enable the HTTP API. Then use “Find my Bridge” and “Pair the Bridge” below (press the Bridge button when asked), or copy the IP address and the API token shown by the app.",
+        "fr": "Dans l’app Nuki, ouvrez les réglages du Bridge et activez l’API HTTP. Utilisez ensuite « Trouver mon Bridge » puis « Appairer le Bridge » ci-dessous (appuyez sur le bouton du Bridge quand demandé), ou recopiez l’adresse IP et le jeton d’API affichés par l’app.",
+        "de": "Öffnen Sie in der Nuki-App die Bridge-Einstellungen und aktivieren Sie die HTTP-API. Nutzen Sie dann unten „Meine Bridge finden“ und „Bridge koppeln“ (drücken Sie den Bridge-Knopf, wenn Sie dazu aufgefordert werden), oder übernehmen Sie IP-Adresse und API-Token aus der App.",
+        "es": "En la app Nuki, abra los ajustes del Bridge y active la API HTTP. Después use «Buscar mi Bridge» y «Emparejar el Bridge» más abajo (pulse el botón del Bridge cuando se le pida), o copie la dirección IP y el token de la API que muestra la app."
+      }
+    },
+    {
+      "key": "bridge_ip",
+      "type": "string",
+      "label": {
+        "en": "Bridge IP address",
+        "fr": "Adresse IP du Bridge",
+        "de": "IP-Adresse der Bridge",
+        "es": "Dirección IP del Bridge"
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.50",
+        "fr": "ex. 192.168.1.50",
+        "de": "z. B. 192.168.1.50",
+        "es": "p. ej. 192.168.1.50"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "bridge_port",
+      "type": "number",
+      "label": {
+        "en": "Bridge port",
+        "fr": "Port du Bridge",
+        "de": "Port der Bridge",
+        "es": "Puerto del Bridge"
+      },
+      "required": false,
+      "default": 8080,
+      "min": 1,
+      "max": 65535
+    },
+    {
+      "key": "bridge_token",
+      "type": "secret",
+      "label": {
+        "en": "Bridge API token",
+        "fr": "Jeton d’API du Bridge",
+        "de": "API-Token der Bridge",
+        "es": "Token de la API del Bridge"
+      },
+      "description": {
+        "en": "Filled in automatically by “Pair the Bridge”.",
+        "fr": "Rempli automatiquement par « Appairer le Bridge ».",
+        "de": "Wird von „Bridge koppeln“ automatisch ausgefüllt.",
+        "es": "Se rellena automáticamente con «Emparejar el Bridge»."
+      },
+      "required": false
+    },
+    {
+      "key": "bridge_hashed_token",
+      "type": "boolean",
+      "label": {
+        "en": "Send the token hashed",
+        "fr": "Envoyer le jeton haché (sécurisé)",
+        "de": "Token gehasht senden",
+        "es": "Enviar el token con hash (seguro)"
+      },
+      "description": {
+        "en": "Recommended: the token never travels in clear on your network. Turn off only for a Bridge firmware older than 1.13.",
+        "fr": "Recommandé : le jeton ne circule jamais en clair sur votre réseau. À désactiver uniquement pour un firmware de Bridge antérieur à 1.13.",
+        "de": "Empfohlen: das Token wird nie im Klartext über Ihr Netzwerk übertragen. Nur für eine Bridge-Firmware älter als 1.13 deaktivieren.",
+        "es": "Recomendado: el token nunca viaja en claro por su red. Desactívelo solo para un firmware del Bridge anterior a 1.13."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "mqtt_section",
+      "type": "section",
+      "label": {
+        "en": "MQTT (local, real time)",
+        "fr": "MQTT (local, temps réel)",
+        "de": "MQTT (lokal, Echtzeit)",
+        "es": "MQTT (local, tiempo real)"
+      },
+      "description": {
+        "en": "For the Smart Lock 3.0 Pro, 4th generation and Ultra: in the Nuki app, enable MQTT and point the lock to your broker (use its IP address). Enter the same broker here. Changes arrive instantly, without polling.",
+        "fr": "Pour les Smart Lock 3.0 Pro, 4e génération et Ultra : dans l’app Nuki, activez MQTT et indiquez votre broker à la serrure (avec son adresse IP). Saisissez le même broker ici. Les changements arrivent instantanément, sans interrogation.",
+        "de": "Für Smart Lock 3.0 Pro, 4. Generation und Ultra: aktivieren Sie in der Nuki-App MQTT und tragen Sie Ihren Broker im Schloss ein (mit seiner IP-Adresse). Geben Sie hier denselben Broker ein. Änderungen kommen sofort an, ohne Abfrage.",
+        "es": "Para los Smart Lock 3.0 Pro, 4.ª generación y Ultra: en la app Nuki, active MQTT e indique su broker a la cerradura (con su dirección IP). Introduzca aquí el mismo broker. Los cambios llegan al instante, sin sondeo."
+      },
+      "links": [
+        {
+          "url": "https://developer.nuki.io/page/nuki-smart-lock-mqtt-api/2",
+          "label": {
+            "en": "Nuki MQTT API",
+            "fr": "API MQTT Nuki",
+            "de": "Nuki MQTT-API",
+            "es": "API MQTT de Nuki"
+          }
+        }
+      ]
+    },
+    {
+      "key": "mqtt_url",
+      "type": "string",
+      "label": {
+        "en": "MQTT broker URL",
+        "fr": "URL du broker MQTT",
+        "de": "URL des MQTT-Brokers",
+        "es": "URL del broker MQTT"
+      },
+      "placeholder": {
+        "en": "e.g. mqtt://192.168.1.10:1883",
+        "fr": "ex. mqtt://192.168.1.10:1883",
+        "de": "z. B. mqtt://192.168.1.10:1883",
+        "es": "p. ej. mqtt://192.168.1.10:1883"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "mqtt_username",
+      "type": "string",
+      "label": {
+        "en": "MQTT username",
+        "fr": "Utilisateur MQTT",
+        "de": "MQTT-Benutzername",
+        "es": "Usuario MQTT"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "mqtt_password",
+      "type": "secret",
+      "label": {
+        "en": "MQTT password",
+        "fr": "Mot de passe MQTT",
+        "de": "MQTT-Passwort",
+        "es": "Contraseña MQTT"
+      },
+      "required": false
+    },
+    {
+      "key": "web_section",
+      "type": "section",
+      "label": {
+        "en": "Nuki Web (cloud)",
+        "fr": "Nuki Web (cloud)",
+        "de": "Nuki Web (Cloud)",
+        "es": "Nuki Web (nube)"
+      },
+      "description": {
+        "en": "Enable Nuki Web in the Nuki app, then on web.nuki.io open “API” and generate an API token with the smartlock, smartlock action and log permissions. Nuki Web also tells who locked or unlocked (user, keypad, fingerprint...).",
+        "fr": "Activez Nuki Web dans l’app Nuki, puis sur web.nuki.io ouvrez « API » et générez un jeton d’API avec les droits smartlock, smartlock action et log. Nuki Web indique aussi qui a verrouillé ou déverrouillé (utilisateur, clavier, empreinte...).",
+        "de": "Aktivieren Sie Nuki Web in der Nuki-App, öffnen Sie dann auf web.nuki.io „API“ und erzeugen Sie ein API-Token mit den Rechten smartlock, smartlock action und log. Nuki Web zeigt außerdem, wer ver- oder entriegelt hat (Benutzer, Keypad, Fingerabdruck...).",
+        "es": "Active Nuki Web en la app Nuki y, en web.nuki.io, abra «API» y genere un token con los permisos smartlock, smartlock action y log. Nuki Web indica además quién bloqueó o desbloqueó (usuario, teclado, huella...)."
+      },
+      "links": [
+        {
+          "url": "https://web.nuki.io/#/admin/web-api",
+          "label": {
+            "en": "Nuki Web API tokens",
+            "fr": "Jetons d’API Nuki Web",
+            "de": "Nuki Web API-Token",
+            "es": "Tokens de la API Nuki Web"
+          }
+        }
+      ]
+    },
+    {
+      "key": "web_api_token",
+      "type": "secret",
+      "label": {
+        "en": "Nuki Web API token",
+        "fr": "Jeton d’API Nuki Web",
+        "de": "Nuki Web API-Token",
+        "es": "Token de la API Nuki Web"
+      },
+      "required": false
+    },
+    {
+      "key": "options_section",
+      "type": "section",
+      "label": { "en": "Options", "fr": "Options", "de": "Optionen", "es": "Opciones" },
+      "description": {
+        "en": "How often the Bridge and Nuki Web are read (MQTT needs no polling), and what the lock switch of Gladys does.",
+        "fr": "Fréquence de lecture du Bridge et de Nuki Web (MQTT n’a pas besoin d’interrogation), et comportement de l’interrupteur de serrure de Gladys.",
+        "de": "Wie oft Bridge und Nuki Web abgefragt werden (MQTT braucht keine Abfrage) und was der Schloss-Schalter von Gladys tut.",
+        "es": "Con qué frecuencia se leen el Bridge y Nuki Web (MQTT no necesita sondeo) y qué hace el interruptor de cerradura de Gladys."
+      }
+    },
+    {
+      "key": "poll_frequency",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "Seconds between two reads of the Bridge (10 minimum). Nuki Web is never read more often than every 30 seconds.",
+        "fr": "Secondes entre deux lectures du Bridge (10 minimum). Nuki Web n’est jamais lu plus d’une fois toutes les 30 secondes.",
+        "de": "Sekunden zwischen zwei Abfragen der Bridge (mindestens 10). Nuki Web wird höchstens alle 30 Sekunden abgefragt.",
+        "es": "Segundos entre dos lecturas del Bridge (10 como mínimo). Nuki Web nunca se lee más de una vez cada 30 segundos."
+      },
+      "required": false,
+      "default": 30,
+      "min": 10,
+      "max": 3600
+    },
+    {
+      "key": "unlock_action",
+      "type": "select",
+      "label": {
+        "en": "When Gladys unlocks",
+        "fr": "Quand Gladys déverrouille",
+        "de": "Wenn Gladys entriegelt",
+        "es": "Cuando Gladys desbloquea"
+      },
+      "required": false,
+      "default": "unlock",
+      "options": [
+        {
+          "value": "unlock",
+          "label": {
+            "en": "Unlock only",
+            "fr": "Déverrouiller seulement",
+            "de": "Nur entriegeln",
+            "es": "Solo desbloquear"
+          }
+        },
+        {
+          "value": "unlatch",
+          "label": {
+            "en": "Unlock and open the door",
+            "fr": "Déverrouiller et ouvrir la porte",
+            "de": "Entriegeln und Tür öffnen",
+            "es": "Desbloquear y abrir la puerta"
+          }
+        }
+      ]
+    },
+    {
+      "key": "lock_action",
+      "type": "select",
+      "label": {
+        "en": "When Gladys locks",
+        "fr": "Quand Gladys verrouille",
+        "de": "Wenn Gladys verriegelt",
+        "es": "Cuando Gladys bloquea"
+      },
+      "required": false,
+      "default": "lock",
+      "options": [
+        {
+          "value": "lock",
+          "label": { "en": "Lock", "fr": "Verrouiller", "de": "Verriegeln", "es": "Bloquear" }
+        },
+        {
+          "value": "full_lock",
+          "label": {
+            "en": "Full lock (two turns, 3.0 and later)",
+            "fr": "Verrouillage complet (deux tours, 3.0 et +)",
+            "de": "Doppelt verriegeln (zwei Umdrehungen, ab 3.0)",
+            "es": "Bloqueo completo (dos vueltas, 3.0 y posteriores)"
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Checks the Bridge, the MQTT broker and Nuki Web.",
+        "fr": "Vérifie le Bridge, le broker MQTT et Nuki Web.",
+        "de": "Prüft die Bridge, den MQTT-Broker und Nuki Web.",
+        "es": "Comprueba el Bridge, el broker MQTT y Nuki Web."
+      },
+      "timeout_seconds": 45
+    },
+    {
+      "key": "discover_bridge",
+      "label": {
+        "en": "Find my Bridge",
+        "fr": "Trouver mon Bridge",
+        "de": "Meine Bridge finden",
+        "es": "Buscar mi Bridge"
+      },
+      "description": {
+        "en": "Asks the Nuki discovery service for the Bridges of your network and saves the IP address.",
+        "fr": "Demande au service de découverte Nuki les Bridges de votre réseau et enregistre l’adresse IP.",
+        "de": "Fragt den Nuki-Erkennungsdienst nach den Bridges Ihres Netzwerks und speichert die IP-Adresse.",
+        "es": "Pide al servicio de descubrimiento de Nuki los Bridges de su red y guarda la dirección IP."
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "pair_bridge",
+      "label": {
+        "en": "Pair the Bridge",
+        "fr": "Appairer le Bridge",
+        "de": "Bridge koppeln",
+        "es": "Emparejar el Bridge"
+      },
+      "description": {
+        "en": "Click, then press the Bridge button within 30 seconds: the API token is saved for you.",
+        "fr": "Cliquez, puis appuyez sur le bouton du Bridge dans les 30 secondes : le jeton d’API est enregistré pour vous.",
+        "de": "Klicken Sie und drücken Sie dann innerhalb von 30 Sekunden den Bridge-Knopf: das API-Token wird für Sie gespeichert.",
+        "es": "Haga clic y pulse el botón del Bridge en menos de 30 segundos: el token de la API se guarda automáticamente."
+      },
+      "timeout_seconds": 60
+    },
+    {
+      "key": "refresh_devices",
+      "label": {
+        "en": "Refresh now",
+        "fr": "Rafraîchir maintenant",
+        "de": "Jetzt aktualisieren",
+        "es": "Actualizar ahora"
+      },
+      "description": {
+        "en": "Reads every device again and updates the Discovery tab.",
+        "fr": "Relit tous les appareils et met à jour l’onglet Découverte.",
+        "de": "Liest alle Geräte erneut und aktualisiert den Tab „Erkennung“.",
+        "es": "Vuelve a leer todos los dispositivos y actualiza la pestaña Descubrimiento."
+      },
+      "timeout_seconds": 45
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "lock_action",
+      "label": {
+        "en": "Nuki lock operated",
+        "fr": "Serrure Nuki actionnée",
+        "de": "Nuki-Schloss bedient",
+        "es": "Cerradura Nuki accionada"
+      },
+      "description": {
+        "en": "A lock was locked, unlocked or opened — with who and how.",
+        "fr": "Une serrure a été verrouillée, déverrouillée ou ouverte — avec qui et comment.",
+        "de": "Ein Schloss wurde ver-, entriegelt oder geöffnet — mit wer und wie.",
+        "es": "Una cerradura se bloqueó, desbloqueó o abrió — con quién y cómo."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Lock", "fr": "Serrure", "de": "Schloss", "es": "Cerradura" }
+        },
+        {
+          "key": "action",
+          "type": "multi_select",
+          "label": { "en": "Operation", "fr": "Opération", "de": "Vorgang", "es": "Operación" },
+          "options": [
+            {
+              "value": "lock",
+              "label": { "en": "Lock", "fr": "Verrouillage", "de": "Verriegeln", "es": "Bloqueo" }
+            },
+            {
+              "value": "unlock",
+              "label": {
+                "en": "Unlock",
+                "fr": "Déverrouillage",
+                "de": "Entriegeln",
+                "es": "Desbloqueo"
+              }
+            },
+            {
+              "value": "unlatch",
+              "label": {
+                "en": "Door opening",
+                "fr": "Ouverture de porte",
+                "de": "Türöffnung",
+                "es": "Apertura de puerta"
+              }
+            },
+            {
+              "value": "lock_n_go",
+              "label": {
+                "en": "Lock 'n' Go",
+                "fr": "Lock 'n' Go",
+                "de": "Lock 'n' Go",
+                "es": "Lock 'n' Go"
+              }
+            }
+          ]
+        },
+        {
+          "key": "trigger",
+          "type": "multi_select",
+          "label": {
+            "en": "Operated by",
+            "fr": "Actionnée par",
+            "de": "Bedient über",
+            "es": "Accionada por"
+          },
+          "options": [
+            {
+              "value": "app",
+              "label": { "en": "Nuki app", "fr": "App Nuki", "de": "Nuki-App", "es": "App Nuki" }
+            },
+            {
+              "value": "manual",
+              "label": { "en": "By hand", "fr": "À la main", "de": "Von Hand", "es": "A mano" }
+            },
+            {
+              "value": "button",
+              "label": {
+                "en": "Lock button",
+                "fr": "Bouton de la serrure",
+                "de": "Schlossknopf",
+                "es": "Botón de la cerradura"
+              }
+            },
+            {
+              "value": "keypad",
+              "label": { "en": "Keypad", "fr": "Clavier", "de": "Keypad", "es": "Teclado" }
+            },
+            {
+              "value": "fingerprint",
+              "label": {
+                "en": "Fingerprint",
+                "fr": "Empreinte digitale",
+                "de": "Fingerabdruck",
+                "es": "Huella dactilar"
+              }
+            },
+            {
+              "value": "auto_lock",
+              "label": {
+                "en": "Auto lock",
+                "fr": "Verrouillage automatique",
+                "de": "Auto-Lock",
+                "es": "Bloqueo automático"
+              }
+            },
+            {
+              "value": "automatic",
+              "label": {
+                "en": "Automation / time control",
+                "fr": "Automatisme / programmation",
+                "de": "Automatik / Zeitsteuerung",
+                "es": "Automatismo / programación"
+              }
+            },
+            {
+              "value": "web",
+              "label": { "en": "Nuki Web", "fr": "Nuki Web", "de": "Nuki Web", "es": "Nuki Web" }
+            },
+            {
+              "value": "accessory",
+              "label": {
+                "en": "Fob / accessory",
+                "fr": "Télécommande / accessoire",
+                "de": "Fob / Zubehör",
+                "es": "Mando / accesorio"
+              }
+            },
+            {
+              "value": "homekit",
+              "label": {
+                "en": "HomeKit / Matter",
+                "fr": "HomeKit / Matter",
+                "de": "HomeKit / Matter",
+                "es": "HomeKit / Matter"
+              }
+            },
+            {
+              "value": "mqtt",
+              "label": { "en": "MQTT", "fr": "MQTT", "de": "MQTT", "es": "MQTT" }
+            },
+            {
+              "value": "gladys",
+              "label": { "en": "Gladys", "fr": "Gladys", "de": "Gladys", "es": "Gladys" }
+            },
+            {
+              "value": "unknown",
+              "label": { "en": "Unknown", "fr": "Inconnu", "de": "Unbekannt", "es": "Desconocido" }
+            }
+          ]
+        },
+        {
+          "key": "user",
+          "type": "string",
+          "label": {
+            "en": "Nuki user (Nuki Web)",
+            "fr": "Utilisateur Nuki (Nuki Web)",
+            "de": "Nuki-Benutzer (Nuki Web)",
+            "es": "Usuario Nuki (Nuki Web)"
+          },
+          "placeholder": {
+            "en": "Exact name, e.g. Alice",
+            "fr": "Nom exact, ex. Alice",
+            "de": "Genauer Name, z. B. Alice",
+            "es": "Nombre exacto, p. ej. Alice"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "action",
+          "type": "string",
+          "label": { "en": "Operation", "fr": "Opération", "de": "Vorgang", "es": "Operación" }
+        },
+        {
+          "key": "trigger",
+          "type": "string",
+          "label": {
+            "en": "Operated by",
+            "fr": "Actionnée par",
+            "de": "Bedient über",
+            "es": "Accionada por"
+          }
+        },
+        {
+          "key": "user",
+          "type": "string",
+          "label": {
+            "en": "Nuki user",
+            "fr": "Utilisateur Nuki",
+            "de": "Nuki-Benutzer",
+            "es": "Usuario Nuki"
+          }
+        },
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Lock name",
+            "fr": "Nom de la serrure",
+            "de": "Name des Schlosses",
+            "es": "Nombre de la cerradura"
+          }
+        }
+      ]
+    },
+    {
+      "key": "doorbell_ring",
+      "label": {
+        "en": "Nuki Opener: doorbell rang",
+        "fr": "Nuki Opener : on a sonné",
+        "de": "Nuki Opener: es hat geklingelt",
+        "es": "Nuki Opener: han llamado al timbre"
+      },
+      "description": {
+        "en": "Someone rang at the intercom (Opener paired with a Bridge).",
+        "fr": "Quelqu’un a sonné à l’interphone (Opener appairé à un Bridge).",
+        "de": "Jemand hat an der Sprechanlage geklingelt (Opener mit Bridge gekoppelt).",
+        "es": "Alguien llamó al portero (Opener emparejado con un Bridge)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Opener", "fr": "Opener", "de": "Opener", "es": "Opener" }
+        }
+      ],
+      "variables": [
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Opener name",
+            "fr": "Nom de l’Opener",
+            "de": "Name des Openers",
+            "es": "Nombre del Opener"
+          }
+        }
+      ]
+    },
+    {
+      "key": "lock_error",
+      "label": {
+        "en": "Nuki lock problem",
+        "fr": "Problème de serrure Nuki",
+        "de": "Problem mit Nuki-Schloss",
+        "es": "Problema de cerradura Nuki"
+      },
+      "description": {
+        "en": "Motor blocked, lock uncalibrated, or a command the lock refused.",
+        "fr": "Moteur bloqué, serrure non calibrée, ou commande refusée par la serrure.",
+        "de": "Motor blockiert, Schloss nicht kalibriert oder ein vom Schloss abgelehnter Befehl.",
+        "es": "Motor bloqueado, cerradura sin calibrar u orden rechazada por la cerradura."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Lock", "fr": "Serrure", "de": "Schloss", "es": "Cerradura" }
+        },
+        {
+          "key": "error",
+          "type": "multi_select",
+          "label": { "en": "Problem", "fr": "Problème", "de": "Problem", "es": "Problema" },
+          "options": [
+            {
+              "value": "motor_blocked",
+              "label": {
+                "en": "Motor blocked",
+                "fr": "Moteur bloqué",
+                "de": "Motor blockiert",
+                "es": "Motor bloqueado"
+              }
+            },
+            {
+              "value": "uncalibrated",
+              "label": {
+                "en": "Uncalibrated",
+                "fr": "Non calibrée",
+                "de": "Nicht kalibriert",
+                "es": "Sin calibrar"
+              }
+            },
+            {
+              "value": "command_failed",
+              "label": {
+                "en": "Command refused",
+                "fr": "Commande refusée",
+                "de": "Befehl abgelehnt",
+                "es": "Orden rechazada"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "error",
+          "type": "string",
+          "label": { "en": "Problem", "fr": "Problème", "de": "Problem", "es": "Problema" }
+        },
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Lock name",
+            "fr": "Nom de la serrure",
+            "de": "Name des Schlosses",
+            "es": "Nombre de la cerradura"
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_critical",
+      "label": {
+        "en": "Nuki battery critical",
+        "fr": "Batterie Nuki critique",
+        "de": "Nuki-Batterie kritisch",
+        "es": "Batería Nuki crítica"
+      },
+      "description": {
+        "en": "The battery of a lock, an Opener, a keypad or a door sensor runs low.",
+        "fr": "La batterie d’une serrure, d’un Opener, d’un clavier ou d’un capteur de porte est faible.",
+        "de": "Die Batterie eines Schlosses, Openers, Keypads oder Türsensors ist schwach.",
+        "es": "La batería de una cerradura, un Opener, un teclado o un sensor de puerta está baja."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" }
+        },
+        {
+          "key": "component",
+          "type": "multi_select",
+          "label": { "en": "Component", "fr": "Élément", "de": "Komponente", "es": "Componente" },
+          "options": [
+            {
+              "value": "device",
+              "label": {
+                "en": "Lock / Opener",
+                "fr": "Serrure / Opener",
+                "de": "Schloss / Opener",
+                "es": "Cerradura / Opener"
+              }
+            },
+            {
+              "value": "keypad",
+              "label": { "en": "Keypad", "fr": "Clavier", "de": "Keypad", "es": "Teclado" }
+            },
+            {
+              "value": "door_sensor",
+              "label": {
+                "en": "Door sensor",
+                "fr": "Capteur de porte",
+                "de": "Türsensor",
+                "es": "Sensor de puerta"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "component",
+          "type": "string",
+          "label": { "en": "Component", "fr": "Élément", "de": "Komponente", "es": "Componente" }
+        },
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Device name",
+            "fr": "Nom de l’appareil",
+            "de": "Gerätename",
+            "es": "Nombre del dispositivo"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "operate_lock",
+      "label": {
+        "en": "Operate a Nuki lock",
+        "fr": "Actionner une serrure Nuki",
+        "de": "Nuki-Schloss bedienen",
+        "es": "Accionar una cerradura Nuki"
+      },
+      "description": {
+        "en": "Lock, unlock, open the door, Lock 'n' Go or full lock.",
+        "fr": "Verrouiller, déverrouiller, ouvrir la porte, Lock 'n' Go ou verrouillage complet.",
+        "de": "Verriegeln, entriegeln, Tür öffnen, Lock 'n' Go oder doppelt verriegeln.",
+        "es": "Bloquear, desbloquear, abrir la puerta, Lock 'n' Go o bloqueo completo."
+      },
+      "timeout_seconds": 45,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Lock", "fr": "Serrure", "de": "Schloss", "es": "Cerradura" },
+          "required": true
+        },
+        {
+          "key": "action",
+          "type": "select",
+          "label": { "en": "Operation", "fr": "Opération", "de": "Vorgang", "es": "Operación" },
+          "required": true,
+          "default": "lock",
+          "options": [
+            {
+              "value": "lock",
+              "label": { "en": "Lock", "fr": "Verrouiller", "de": "Verriegeln", "es": "Bloquear" }
+            },
+            {
+              "value": "unlock",
+              "label": {
+                "en": "Unlock",
+                "fr": "Déverrouiller",
+                "de": "Entriegeln",
+                "es": "Desbloquear"
+              }
+            },
+            {
+              "value": "unlatch",
+              "label": {
+                "en": "Open the door",
+                "fr": "Ouvrir la porte",
+                "de": "Tür öffnen",
+                "es": "Abrir la puerta"
+              }
+            },
+            {
+              "value": "lock_n_go",
+              "label": {
+                "en": "Lock 'n' Go",
+                "fr": "Lock 'n' Go",
+                "de": "Lock 'n' Go",
+                "es": "Lock 'n' Go"
+              }
+            },
+            {
+              "value": "lock_n_go_unlatch",
+              "label": {
+                "en": "Lock 'n' Go with unlatch",
+                "fr": "Lock 'n' Go avec ouverture",
+                "de": "Lock 'n' Go mit Öffnen",
+                "es": "Lock 'n' Go con apertura"
+              }
+            },
+            {
+              "value": "full_lock",
+              "label": {
+                "en": "Full lock (two turns)",
+                "fr": "Verrouillage complet (deux tours)",
+                "de": "Doppelt verriegeln",
+                "es": "Bloqueo completo (dos vueltas)"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "success",
+          "type": "boolean",
+          "label": {
+            "en": "Command sent",
+            "fr": "Commande envoyée",
+            "de": "Befehl gesendet",
+            "es": "Orden enviada"
+          }
+        }
+      ]
+    },
+    {
+      "key": "operate_opener",
+      "label": {
+        "en": "Operate a Nuki Opener",
+        "fr": "Actionner un Nuki Opener",
+        "de": "Nuki Opener bedienen",
+        "es": "Accionar un Nuki Opener"
+      },
+      "description": {
+        "en": "Buzz the door, Ring to Open or continuous mode.",
+        "fr": "Ouvrir la gâche, Ring to Open ou mode continu.",
+        "de": "Türsummer, Ring to Open oder Daueröffnung.",
+        "es": "Abrepuertas, Ring to Open o modo continuo."
+      },
+      "timeout_seconds": 45,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Opener", "fr": "Opener", "de": "Opener", "es": "Opener" },
+          "required": true
+        },
+        {
+          "key": "action",
+          "type": "select",
+          "label": { "en": "Operation", "fr": "Opération", "de": "Vorgang", "es": "Operación" },
+          "required": true,
+          "default": "electric_strike",
+          "options": [
+            {
+              "value": "electric_strike",
+              "label": {
+                "en": "Buzz the door",
+                "fr": "Ouvrir la porte (gâche)",
+                "de": "Türsummer betätigen",
+                "es": "Abrir la puerta"
+              }
+            },
+            {
+              "value": "activate_rto",
+              "label": {
+                "en": "Ring to Open on",
+                "fr": "Activer Ring to Open",
+                "de": "Ring to Open ein",
+                "es": "Activar Ring to Open"
+              }
+            },
+            {
+              "value": "deactivate_rto",
+              "label": {
+                "en": "Ring to Open off",
+                "fr": "Désactiver Ring to Open",
+                "de": "Ring to Open aus",
+                "es": "Desactivar Ring to Open"
+              }
+            },
+            {
+              "value": "activate_continuous",
+              "label": {
+                "en": "Continuous mode on",
+                "fr": "Activer le mode continu",
+                "de": "Daueröffnung ein",
+                "es": "Activar el modo continuo"
+              }
+            },
+            {
+              "value": "deactivate_continuous",
+              "label": {
+                "en": "Continuous mode off",
+                "fr": "Désactiver le mode continu",
+                "de": "Daueröffnung aus",
+                "es": "Desactivar el modo continuo"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "success",
+          "type": "boolean",
+          "label": {
+            "en": "Command sent",
+            "fr": "Commande envoyée",
+            "de": "Befehl gesendet",
+            "es": "Orden enviada"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_lock_status",
+      "label": {
+        "en": "Read a Nuki device",
+        "fr": "Lire un appareil Nuki",
+        "de": "Nuki-Gerät auslesen",
+        "es": "Leer un dispositivo Nuki"
+      },
+      "description": {
+        "en": "Locked? Door open? Battery? For the next actions of the scene.",
+        "fr": "Verrouillée ? Porte ouverte ? Batterie ? Pour les actions suivantes de la scène.",
+        "de": "Verriegelt? Tür offen? Batterie? Für die nächsten Aktionen der Szene.",
+        "es": "¿Bloqueada? ¿Puerta abierta? ¿Batería? Para las siguientes acciones de la escena."
+      },
+      "timeout_seconds": 10,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "locked",
+          "type": "boolean",
+          "label": { "en": "Locked", "fr": "Verrouillée", "de": "Verriegelt", "es": "Bloqueada" }
+        },
+        {
+          "key": "state",
+          "type": "string",
+          "label": { "en": "State", "fr": "État", "de": "Zustand", "es": "Estado" }
+        },
+        {
+          "key": "door_open",
+          "type": "boolean",
+          "label": {
+            "en": "Door open",
+            "fr": "Porte ouverte",
+            "de": "Tür offen",
+            "es": "Puerta abierta"
+          }
+        },
+        {
+          "key": "battery",
+          "type": "number",
+          "label": {
+            "en": "Battery (%)",
+            "fr": "Batterie (%)",
+            "de": "Batterie (%)",
+            "es": "Batería (%)"
+          }
+        },
+        {
+          "key": "battery_critical",
+          "type": "boolean",
+          "label": {
+            "en": "Battery critical",
+            "fr": "Batterie critique",
+            "de": "Batterie kritisch",
+            "es": "Batería crítica"
+          }
+        },
+        {
+          "key": "reachable",
+          "type": "boolean",
+          "label": { "en": "Reachable", "fr": "Joignable", "de": "Erreichbar", "es": "Accesible" }
+        }
+      ]
+    },
+    {
+      "key": "lock_all",
+      "label": {
+        "en": "Lock every Nuki lock",
+        "fr": "Verrouiller toutes les serrures Nuki",
+        "de": "Alle Nuki-Schlösser verriegeln",
+        "es": "Bloquear todas las cerraduras Nuki"
+      },
+      "description": {
+        "en": "Locks every Nuki lock, e.g. when everyone leaves home.",
+        "fr": "Verrouille toutes les serrures Nuki, par exemple quand tout le monde part.",
+        "de": "Verriegelt alle Nuki-Schlösser, z. B. wenn alle das Haus verlassen.",
+        "es": "Bloquea todas las cerraduras Nuki, por ejemplo cuando todos salen de casa."
+      },
+      "timeout_seconds": 90,
+      "outputs": [
+        {
+          "key": "locked_count",
+          "type": "number",
+          "label": {
+            "en": "Locks locked",
+            "fr": "Serrures verrouillées",
+            "de": "Verriegelte Schlösser",
+            "es": "Cerraduras bloqueadas"
+          }
+        },
+        {
+          "key": "failed_count",
+          "type": "number",
+          "label": { "en": "Failures", "fr": "Échecs", "de": "Fehler", "es": "Fallos" }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "nuki_lock",
+      "label": {
+        "en": "Nuki lock",
+        "fr": "Serrure Nuki",
+        "de": "Nuki-Schloss",
+        "es": "Cerradura Nuki"
+      },
+      "description": {
+        "en": "State, battery, door, last activity and buttons of a lock or Opener.",
+        "fr": "État, batterie, porte, dernière activité et boutons d’une serrure ou d’un Opener.",
+        "de": "Zustand, Batterie, Tür, letzte Aktivität und Tasten eines Schlosses oder Openers.",
+        "es": "Estado, batería, puerta, última actividad y botones de una cerradura u Opener."
+      },
+      "icon": "lock",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Device", "fr": "Appareil", "de": "Gerät", "es": "Dispositivo" },
+          "required": true
+        }
+      ],
+      "action_timeout_seconds": 45
+    },
+    {
+      "key": "nuki_overview",
+      "label": {
+        "en": "Nuki overview",
+        "fr": "Vue d’ensemble Nuki",
+        "de": "Nuki-Übersicht",
+        "es": "Resumen Nuki"
+      },
+      "description": {
+        "en": "Every Nuki device at a glance, with a “Lock all” button.",
+        "fr": "Tous les appareils Nuki d’un coup d’œil, avec un bouton « Tout verrouiller ».",
+        "de": "Alle Nuki-Geräte auf einen Blick, mit „Alle verriegeln“-Taste.",
+        "es": "Todos los dispositivos Nuki de un vistazo, con un botón «Bloquear todo»."
+      },
+      "icon": "shield",
+      "action_timeout_seconds": 90
+    },
+    {
+      "key": "nuki_activity",
+      "label": {
+        "en": "Nuki activity",
+        "fr": "Activité Nuki",
+        "de": "Nuki-Aktivität",
+        "es": "Actividad Nuki"
+      },
+      "description": {
+        "en": "Who locked or unlocked, how and when.",
+        "fr": "Qui a verrouillé ou déverrouillé, comment et quand.",
+        "de": "Wer ver- oder entriegelt hat, wie und wann.",
+        "es": "Quién bloqueó o desbloqueó, cómo y cuándo."
+      },
+      "icon": "list"
+    }
+  ]
+}
