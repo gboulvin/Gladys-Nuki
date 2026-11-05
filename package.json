@@ -1,6 +1,6 @@
 {
   "name": "gladys-nuki",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Nuki external integration for Gladys Assistant: Smart Lock, Opener and Smart Door through the Nuki Bridge, MQTT or Nuki Web.",
   "type": "module",

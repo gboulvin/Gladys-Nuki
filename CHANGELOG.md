@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-05
+
 ### Fixed
 
 - A lock connected through MQTT only showed a second "Battery low" feature
@@ -47,5 +49,6 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish for the manifest, the messages, the
   widgets and the documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-Nuki/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/gboulvin/Gladys-Nuki/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/gboulvin/Gladys-Nuki/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/gboulvin/Gladys-Nuki/releases/tag/v1.0.0
