@@ -141,7 +141,9 @@ test('MQTT messages fold into a snapshot', () => {
   snapshot = foldMqtt(snapshot, LOCK_ID, 'keypadBatteryCritical', 'false');
   assert.equal(snapshot.batteryCritical, true);
   assert.equal(snapshot.batteryCharge, 42);
-  assert.equal(snapshot.hasKeypad, true);
+  assert.equal(snapshot.hasKeypad, false, 'published without a keypad too');
+  snapshot = foldMqtt(snapshot, LOCK_ID, 'keypadBatteryCritical', 'true');
+  assert.equal(snapshot.hasKeypad, true, 'a critical keypad battery proves a keypad');
   assert.equal(foldMqtt(snapshot, LOCK_ID, 'serverConnected', 'true'), snapshot, 'ignored topic');
   assert.deepEqual(parseLockActionEvent('1,172,0,0,0'), {
     action: 1,

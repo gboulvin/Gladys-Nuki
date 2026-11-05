@@ -313,3 +313,44 @@ test('a new accessory refreshes the Discovery tab', async (t) => {
   await hub.refresh();
   assert.equal(gladys.fake.discoveredDevices[0].features.length, before + 2, 'door + its battery');
 });
+
+test('MQTT alone: no keypad feature unless a keypad is known', async (t) => {
+  // Field report: an MQTT lock without keypad showed "Battery low" twice.
+  const mqtt = fakeMqtt();
+  const { hub } = await startHub(t, { mqtt, config: { mqtt_url: '192.168.1.10' } });
+  for (const [topic, payload] of [
+    ['deviceType', 4],
+    ['name', 'Maison'],
+    ['state', 1],
+    ['batteryChargeState', 80],
+    ['batteryCritical', 'false'],
+    ['batteryCharging', 'false'],
+    ['keypadBatteryCritical', 'false'],
+    ['doorsensorState', 1],
+    ['doorsensorBatteryCritical', 'false'],
+  ]) {
+    mqtt.emit(LOCK_ID, topic, payload);
+  }
+  await hub.sync();
+  const [device] = hub.buildDiscoveredDevices();
+  const keys = device.features.map((feature) => feature.external_id.split(':').pop());
+  assert.deepEqual(keys, ['lock', 'state', 'battery', 'battery-low', 'charging']);
+  const categories = device.features.map((feature) => `${feature.category}/${feature.type}`);
+  assert.equal(new Set(categories).size, categories.length, 'no two features look alike');
+});
+
+test('MQTT with a Bridge that reports a keypad keeps the keypad feature', async (t) => {
+  const mqtt = fakeMqtt();
+  const bridge = fakeBridge([bridgeLock()]);
+  const { hub } = await startHub(t, {
+    mqtt,
+    bridge,
+    config: { ...BRIDGE_CONFIG, mqtt_url: '192.168.1.10' },
+  });
+  mqtt.emit(LOCK_ID, 'state', 1);
+  mqtt.emit(LOCK_ID, 'keypadBatteryCritical', 'false');
+  await hub.sync();
+  assert.equal(hub.resolve(LOCK_ID).source, 'mqtt');
+  const [device] = hub.buildDiscoveredDevices();
+  assert.ok(device.features.some((feature) => feature.external_id.endsWith(':keypad-battery-low')));
+});

@@ -10,6 +10,14 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- A lock connected through MQTT only showed a second "Battery low" feature
+  (the keypad battery) even without a paired keypad: the lock publishes this
+  topic either way. The keypad feature now only appears when the Bridge or
+  Nuki Web reports a paired keypad, or when its battery runs critical. After
+  the update, open the Discovery tab and update the device to remove it.
+
 ## [1.0.0] - 2026-11-04
 
 ### Added

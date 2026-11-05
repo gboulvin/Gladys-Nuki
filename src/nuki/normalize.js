@@ -165,7 +165,10 @@ export function foldMqtt(previous, nukiId, topic, payload, receivedAt = Date.now
       break;
     case 'keypadBatteryCritical':
       next.keypadBatteryCritical = MQTT_BOOL(payload);
-      next.hasKeypad = true;
+      // The lock publishes this topic with or without a paired keypad: only
+      // a critical alert proves there is one. The Bridge and Nuki Web know
+      // for sure (see NukiHub.resolve).
+      next.hasKeypad = next.hasKeypad || next.keypadBatteryCritical;
       break;
     case 'doorsensorState':
       next.doorState = num(payload);

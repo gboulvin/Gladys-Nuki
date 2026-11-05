@@ -263,6 +263,10 @@ export class NukiHub {
       if (web?.smartlockId) {
         snapshot.smartlockId = web.smartlockId;
       }
+      // MQTT cannot tell whether a keypad is paired: trust any channel that knows.
+      snapshot.hasKeypad = ['bridge', 'mqtt', 'web'].some(
+        (name) => this.sources[name].get(nukiId)?.hasKeypad,
+      );
       return { snapshot, source };
     }
     const fallback =
